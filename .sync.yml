@@ -7,3 +7,5 @@ Gemfile:
   optional:
     ':test':
       - gem: 'mocha'
+spec/spec_helper.rb:
+  mock_with: ':mocha'
