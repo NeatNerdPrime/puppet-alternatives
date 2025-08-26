@@ -3,9 +3,3 @@
   enabled_lint_checks:
     - parameter_documentation
     - parameter_types
-Gemfile:
-  optional:
-    ':test':
-      - gem: 'mocha'
-spec/spec_helper.rb:
-  mock_with: ':mocha'

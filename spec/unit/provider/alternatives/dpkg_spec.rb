@@ -20,7 +20,7 @@ describe Puppet::Type.type(:alternatives).provider(:dpkg) do
 
   describe '.all' do
     it 'calls update-alternatives --get-selections' do
-      described_class.expects(:update).with('--get-selections').returns my_fixture_read('get-selections')
+      expect(described_class).to receive(:update).with('--get-selections').and_return(my_fixture_read('get-selections'))
       described_class.all
     end
 
@@ -28,7 +28,7 @@ describe Puppet::Type.type(:alternatives).provider(:dpkg) do
       subject { described_class.all }
 
       before do
-        described_class.stubs(:update).with('--get-selections').returns my_fixture_read('get-selections')
+        allow(described_class).to receive(:update).with('--get-selections').and_return(my_fixture_read('get-selections'))
       end
 
       it { is_expected.to be_a Hash }
@@ -39,8 +39,9 @@ describe Puppet::Type.type(:alternatives).provider(:dpkg) do
 
   describe '.instances' do
     it 'delegates to .all' do
-      described_class.expects(:all).returns(stub_selections)
-      described_class.expects(:new).twice.returns(stub)
+      stub_instance = instance_double(described_class)
+      expect(described_class).to receive(:all).and_return(stub_selections)
+      expect(described_class).to receive(:new).twice.and_return(stub_instance)
       described_class.instances
     end
   end
@@ -51,9 +52,9 @@ describe Puppet::Type.type(:alternatives).provider(:dpkg) do
     let(:resource) { Puppet::Type.type(:alternatives).new(name: 'editor') }
 
     before do
-      Puppet::Type.type(:alternatives).stubs(:defaultprovider).returns described_class
+      allow(Puppet::Type.type(:alternatives)).to receive(:defaultprovider).and_return(described_class)
       resource.provider = subject
-      described_class.stubs(:all).returns(stub_selections)
+      allow(described_class).to receive(:all).and_return(stub_selections)
     end
 
     it '#path retrieves the path from class.all' do
@@ -61,18 +62,18 @@ describe Puppet::Type.type(:alternatives).provider(:dpkg) do
     end
 
     it '#path= updates the path with update-alternatives --set' do
-      subject.expects(:update).with('--set', 'editor', '/bin/nano')
+      expect(subject).to receive(:update).with('--set', 'editor', '/bin/nano')
       subject.path = '/bin/nano'
     end
 
     it '#mode=(:auto) calls update-alternatives --auto' do
-      subject.expects(:update).with('--auto', 'editor')
+      expect(subject).to receive(:update).with('--auto', 'editor')
       subject.mode = :auto
     end
 
     it '#mode=(:manual) calls update-alternatives --set with current value' do
-      subject.expects(:path).returns('/usr/bin/vim.tiny')
-      subject.expects(:update).with('--set', 'editor', '/usr/bin/vim.tiny')
+      expect(subject).to receive(:path).and_return('/usr/bin/vim.tiny')
+      expect(subject).to receive(:update).with('--set', 'editor', '/usr/bin/vim.tiny')
       subject.mode = :manual
     end
   end
