@@ -24,9 +24,9 @@ describe Puppet::Type.type(:alternatives).provider(:chkconfig) do
 
   describe '.all' do
     it 'List all alternatives in folder /var/lib/alternatives' do
-      described_class.expects(:list_alternatives).returns my_fixture_alternatives
-      described_class.expects(:update).with('--display', 'sample').returns my_fixture_read('display', 'sample')
-      described_class.expects(:update).with('--display', 'testcmd').returns my_fixture_read('display', 'testcmd')
+      expect(described_class).to receive(:list_alternatives).and_return(my_fixture_alternatives)
+      expect(described_class).to receive(:update).with('--display', 'sample').and_return(my_fixture_read('display', 'sample'))
+      expect(described_class).to receive(:update).with('--display', 'testcmd').and_return(my_fixture_read('display', 'testcmd'))
       described_class.all
     end
 
@@ -34,9 +34,9 @@ describe Puppet::Type.type(:alternatives).provider(:chkconfig) do
       subject { described_class.all }
 
       before do
-        described_class.stubs(:list_alternatives).returns my_fixture_alternatives
-        described_class.stubs(:update).with('--display', 'sample').returns my_fixture_read('display', 'sample')
-        described_class.stubs(:update).with('--display', 'testcmd').returns my_fixture_read('display', 'testcmd')
+        allow(described_class).to receive(:list_alternatives).and_return(my_fixture_alternatives)
+        allow(described_class).to receive(:update).with('--display', 'sample').and_return(my_fixture_read('display', 'sample'))
+        allow(described_class).to receive(:update).with('--display', 'testcmd').and_return(my_fixture_read('display', 'testcmd'))
       end
 
       it { is_expected.to be_a Hash }
@@ -47,8 +47,9 @@ describe Puppet::Type.type(:alternatives).provider(:chkconfig) do
 
   describe '.instances' do
     it 'delegates to .all' do
-      described_class.expects(:all).returns(stub_selections)
-      described_class.expects(:new).twice.returns(stub)
+      stub_instance = instance_double(described_class)
+      expect(described_class).to receive(:all).and_return(stub_selections)
+      expect(described_class).to receive(:new).twice.and_return(stub_instance)
       described_class.instances
     end
   end
@@ -59,11 +60,11 @@ describe Puppet::Type.type(:alternatives).provider(:chkconfig) do
     let(:resource) { Puppet::Type.type(:alternatives).new(name: 'sample') }
 
     before do
-      Puppet::Type.type(:alternatives).stubs(:defaultprovider).returns described_class
-      described_class.stubs(:update).with('--display', 'sample').returns my_fixture_read('display', 'sample')
-      described_class.stubs(:update).with('--display', 'testcmd').returns my_fixture_read('display', 'testcmd')
+      allow(Puppet::Type.type(:alternatives)).to receive(:defaultprovider).and_return(described_class)
+      allow(described_class).to receive(:update).with('--display', 'sample').and_return(my_fixture_read('display', 'sample'))
+      allow(described_class).to receive(:update).with('--display', 'testcmd').and_return(my_fixture_read('display', 'testcmd'))
       resource.provider = subject
-      described_class.stubs(:all).returns(stub_selections)
+      allow(described_class).to receive(:all).and_return(stub_selections)
     end
 
     it '#path retrieves the path from class.all' do
@@ -71,18 +72,18 @@ describe Puppet::Type.type(:alternatives).provider(:chkconfig) do
     end
 
     it '#path= updates the path with alternatives --set' do
-      subject.expects(:update).with('--set', 'sample', '/opt/sample1')
+      expect(subject).to receive(:update).with('--set', 'sample', '/opt/sample1')
       subject.path = '/opt/sample1'
     end
 
     it '#mode=(:auto) calls alternatives --auto' do
-      subject.expects(:update).with('--auto', 'sample')
+      expect(subject).to receive(:update).with('--auto', 'sample')
       subject.mode = :auto
     end
 
     it '#mode=(:manual) calls alternatives --set with current value' do
-      subject.expects(:path).returns('/opt/sample2')
-      subject.expects(:update).with('--set', 'sample', '/opt/sample2')
+      expect(subject).to receive(:path).and_return('/opt/sample2')
+      expect(subject).to receive(:update).with('--set', 'sample', '/opt/sample2')
       subject.mode = :manual
     end
   end
