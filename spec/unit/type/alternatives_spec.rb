@@ -53,11 +53,11 @@ describe Puppet::Type.type(:alternatives) do
       ensure: :present,
       altlink: '/usr/bin/pg_config',
       altname: 'pgsql-pg_config',
-      priority: '910'
+      priority: '910',
     )
     alternatives = described_class.new(
       name: 'pgsql-pg_config',
-      path: '/usr/pgsql-9.1/bin/pg_config'
+      path: '/usr/pgsql-9.1/bin/pg_config',
     )
 
     catalog = Puppet::Resource::Catalog.new

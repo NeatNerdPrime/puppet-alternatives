@@ -2,7 +2,7 @@
 
 Puppet::Type.type(:alternatives).provide(:dpkg) do
   confine 'os.family' => %i[debian suse]
-  defaultfor ['os.name' => %i[debian ubuntu], 'os.family' => :suse]
+  defaultfor [{ 'os.name' => %i[debian ubuntu], 'os.family' => :suse }]
   commands update: 'update-alternatives'
 
   has_feature :mode
@@ -34,9 +34,7 @@ Puppet::Type.type(:alternatives).provide(:dpkg) do
   # Retrieve the current path link
   def path
     name = @resource.value(:name)
-    # rubocop:disable Style/GuardClause
     if (attrs = self.class.all[name])
-      # rubocop:enable Style/GuardClause
       attrs[:path]
     end
   end
