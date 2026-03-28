@@ -2,7 +2,7 @@
 
 Puppet::Type.type(:alternative_entry).provide(:dpkg) do
   confine 'os.family' => %i[debian suse]
-  defaultfor ['os.name' => %i[debian ubuntu], 'os.family' => :suse]
+  defaultfor [{ 'os.name' => %i[debian ubuntu], 'os.family' => :suse }]
 
   commands update: 'update-alternatives'
 

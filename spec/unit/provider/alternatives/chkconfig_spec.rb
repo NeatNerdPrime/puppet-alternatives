@@ -18,7 +18,7 @@ describe Puppet::Type.type(:alternatives).provider(:chkconfig) do
   let(:stub_selections) do
     {
       'sample' => { path: '/opt/sample1' },
-      'testcmd' => { path: '/opt/testcmd1' }
+      'testcmd' => { path: '/opt/testcmd1' },
     }
   end
 
